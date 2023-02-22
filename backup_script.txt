@@ -451,7 +451,14 @@ function onEdit(e){
         closestDifference = difference;
       }
     }
-// SpreadsheetApp.getUi().alert(closestMethod);
+
+    if (targetRowValue == 8000){
+      if (columnBValue_origin >= 26000 && columnBValue_origin <= 47000){
+        closestMethod = 3;
+        method4 = columnBValue_origin / 10; 
+      }
+    }    
+
     var arr = [0, 1, 2, 3, 4, 5, 6];
     var variations = ['-15~-10%', '-10~-5%', '-5~0%', '5~10%', '10~15%', '15~20%', '20~25%'];
 
@@ -460,6 +467,10 @@ function onEdit(e){
     var rule = Math.round((permu.length-1) * Math.random()) ;
 
     var selRule = permu[rule]; 
+
+    if (closestMethod == 3){
+      selRule = [];
+    }
 
     var result = [];
     var dvd_sum = 0;
@@ -682,6 +693,14 @@ function permutation(arr, len){
   f([], arr);
   return result;
 }
+
+
+
+
+
+
+
+
 
 
 
