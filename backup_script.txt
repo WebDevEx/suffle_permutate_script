@@ -1048,10 +1048,10 @@ function onEdit(e){
       subresult[i] = parseFloat(result[i] * 0.11).toFixed(2);
     }
 
-    if ( targetRowValue == 10000 ){
+    if ( targetRowValue == 8000 ){
       for (var i = 0; i < subresult.length; i++){
-        if (subresult[i] > 200){
-          subresult[i] = 200;
+        if (+subresult[i] > 200){
+          subresult[i] = '200';
         }
       }
     }
@@ -1062,7 +1062,7 @@ function onEdit(e){
       if (subresult[i] != 0){
         count++;
       }
-      sum = sum + subresult[i];
+      sum = sum + +subresult[i];
     }
 
     for (var i = 0; i < result.length; i++){
@@ -1143,6 +1143,12 @@ function permutation(arr, len){
   f([], arr);
   return result;
 }
+
+
+
+
+
+
 
 
 
