@@ -56,7 +56,7 @@ function onOpen() {
           }
         } else {
           var targetvalue1 = columnBValue * 10;         
-          // SpreadsheetApp.getUi.alert
+          
         }        
 
         var dd1 = Number.POSITIVE_INFINITY;
