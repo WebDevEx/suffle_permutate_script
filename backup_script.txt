@@ -2167,6 +2167,494 @@ function permutation(arr, len){
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////// ADDED NEW RULE //////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+function onEdit(e){
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Sheet1');
+
+  const range = e.range;
+  var setColumn = range.getColumn();  
+  var setRow = range.getRow();
+  var dvd1 = dvd2 = 0;
+  var compResult = [];
+   
+  if(setColumn == 2 && setRow != 1){    
+    var columnBValue = range.getValue();
+    var option = sheet.getRange(setRow,1).getValue();
+
+    if (columnBValue <= 200) {
+      columnBValue = 200;
+    }
+    
+    if (option == "£12,571 to £50,270") {
+      var targetRowValue = 8000;
+       var targetColumnValue = 3450;
+    }     
+    else if ( option == "Less than £12,570") {
+      if ( columnBValue <= 8000){
+        var targetRowValue = 8000;
+        var targetColumnValue = 3450;
+      } else {
+        var targetRowValue = 40000;
+        var targetColumnValue = 3450;
+      }      
+    }
+
+    if(columnBValue % 1 === 0){
+      columnBValue = columnBValue + parseFloat((Math.random() * (10.99 - 4) + 4).toFixed(2));         
+    }
+
+    if ( targetRowValue == 8000){
+      if (columnBValue < 2011){
+        dvd1 = 1;
+        var targetvalue1  = columnBValue * 10;
+      } else if (columnBValue >= 2011){
+        dvd2 = 1;
+        var targetvalue1 = columnBValue / 10;
+      }
+    } else if (option == "Less than £12,570"){
+      if ( targetRowValue == 8000){
+        if (columnBValue < 3011){
+          dvd1 = 1;
+          var targetvalue1 = columnBValue * 10;
+        } else if (columnBValue >= 3011){
+          dvd2 = 1;
+          var targetvalue1 = columnBValue / 10;
+        }
+      } else if (targetRowValue == 40000){
+        if (columnBValue < 10011){
+          dvd1 = 1;
+          var targetvalue1 = columnBValue * 10;
+        } else if (columnBValue >= 10011){
+          dvd2 = 1;
+          var targetvalue1 = columnBValue / 10;
+        }
+      }      
+    }
+   
+    var dd1 = Number.POSITIVE_INFINITY;
+
+    for (var l = 1; l <= 4; l++) {
+      var d_target = Math.abs(targetvalue1/l-targetColumnValue);
+      if (d_target <= dd1 ){
+        var dv1 = l;
+        dd1 = d_target;
+      }
+    }    
+
+    var dd2 = Number.POSITIVE_INFINITY;
+    
+    for (var l =1; l <= 4; l++){
+      var d_target = Math.abs(columnBValue/l - targetColumnValue);
+      if(d_target <= dd2){
+        var dv2 = l;
+        dd2 = d_target;
+      }
+    }    
+
+    var method1 = targetvalue1 / dv1;
+    if (dvd1 == 1){
+      var method2 = 1;
+    } else if (dvd2 == 1){
+      var method2 = targetvalue1;      
+    }      
+    var method3 = columnBValue / dv2;      
+    if ( option == "Less than £12,570" ){
+      var method4 = 1;
+    }  else if ( option != "Less than £12,570" ){
+      var method4 = columnBValue;   
+    }    
+
+    var arr = [0, 1, 2, 3];
+    var variations = ['-25~-60%', '-25~0%', '0~25%', '25~75%'];
+
+    var permu = permutation(arr, 4);
+
+    var rule = Math.round((permu.length-1) * Math.random()) ;
+
+    var selRule = permu[rule]; 
+
+    var dvd_sum = 0;
+    var multi_number = 0;
+
+    if (targetRowValue == 40000){
+      targetRowValue = 30000;
+    }  
+
+    for (var selectedMethod = 0; selectedMethod < 4; selectedMethod++){
+
+      var result = [];
+      var newIndex = [];
+
+      switch (selectedMethod) {
+        case 0:    
+          multi_number = dv1;        
+          switch (dv1){
+            case 1:
+              result.push(method1);
+              result.push(0);
+              result.push(0);
+              result.push(0);
+              break;
+            case 2:
+              var v= getResult(method1, selRule[0])             
+              result.push(v);
+              result.push(targetvalue1 - v);
+              result.push(0);
+              result.push(0);
+              break;
+            case 3:
+              for (var k = 0; k<3; k++){                                  
+                var diff1 = Math.abs(targetRowValue - dvd_sum);         
+                var re = getResult(method1, selRule[k]);           
+                dvd_sum = dvd_sum + re;
+                var diff2 = Math.abs(targetRowValue-dvd_sum);
+                
+                if (diff1 > diff2){
+                  if(k < 2 ){
+                    result.push(re);
+                  } else {
+                    result.push(targetvalue1 - dvd_sum + re);
+                  }                  
+                } else {                  
+                  result.push(0);                
+                }                      
+              }
+              result.push('0');
+              break;
+            case 4:
+              for (var k = 0; k<4; k++){                                  
+                var diff1 = Math.abs(targetRowValue - dvd_sum); 
+                var re = getResult(method1, selRule[k]);                   
+                dvd_sum = dvd_sum + re;
+                var diff2 = Math.abs(targetRowValue-dvd_sum);
+                
+                if (diff1 > diff2){
+                  if(k < 3 ){
+                    result.push(re);
+                  } else {
+                    result.push(targetvalue1 - dvd_sum + re);
+                  }                  
+                } else {                  
+                  result.push(0);                
+                }                   
+              }
+              break;
+          }
+          break;
+        case 1:  
+          multi_number = 4;
+          if (dvd2 == 1){
+            for (var k = 0; k<4; k++){                                  
+              var diff1 = Math.abs(targetRowValue - dvd_sum); 
+              var re = getResult(method2, selRule[k]);                   
+              dvd_sum = dvd_sum + re;
+              var diff2 = Math.abs(targetRowValue-dvd_sum);
+              
+              if (diff1 > diff2){
+                result.push(re);
+              }else{
+                result.push('0');
+              }
+            }                   
+          } else if (dvd1 == 1) {
+            result.push(method2);
+            result.push(0);
+            result.push(0);
+            result.push(0);            
+          }    
+          break;
+        case 2:          
+          multi_number = dv2;
+          switch(dv2){
+            case 1:
+              result.push(method3);
+              result.push(0);
+              result.push(0);
+              result.push(0);
+              break;
+            case 2:
+              var re = getResult(method3, selRule[0])
+              result.push(re);
+              result.push(columnBValue - re);
+              result.push(0);
+              result.push(0);                
+              break;
+            case 3:
+              for (var k = 0; k<3; k++){                                  
+              var diff1 = Math.abs(targetRowValue - dvd_sum); 
+              var re = getResult(method3, selRule[k]);                   
+              dvd_sum = dvd_sum + re;
+              var diff2 = Math.abs(targetRowValue-dvd_sum);                  
+              if (diff1 > diff2){
+                  if(k < 2 ){
+                    result.push(re);
+                  } else {
+                    result.push(columnBValue - dvd_sum + re);
+                  }                  
+                } else {                  
+                  result.push(0);                
+                }                         
+              }
+              result.push('0');
+              break;
+            case 4:
+              for (var k = 0; k<4; k++){                                  
+              var diff1 = Math.abs(targetRowValue - dvd_sum);                    
+              var re = getResult(method3, selRule[k]);                                                                                                               
+              dvd_sum = dvd_sum + re;
+              var diff2 = Math.abs(targetRowValue-dvd_sum);
+              
+              if (diff1 > diff2){
+                  if(k < 3 ){
+                    result.push(re);
+                  } else {
+                    result.push(columnBValue - dvd_sum + re);
+                  }                  
+                } else {                  
+                  result.push(0);                
+                }                        
+              }
+              break;
+          }
+          break;
+        case 3:      
+          multi_number = 4;
+          for (var k=0; k<4; k++){
+          result.push(getResult(method4, selRule[k]));
+          }
+          break;          
+      }
+
+      for (var i =0; i<result.length; i++){
+        compResult[i] = result[i];
+      }      
+        
+      var countZero = 0;      
+
+      for (var i=0; i<result.length; i++){
+        if(result[i] == 0){       
+          countZero++;
+        }
+      }
+    
+      if (countZero == 0){
+        result = shuffle(result);
+      } else if (countZero == 1) {
+        while (result[0] != 0){
+          result = shuffle(result);
+        }
+      } else if (countZero == 2 || countZero == 3){      
+        while ((result[0] != 0) || (result[3] != 0)){
+          result = shuffle(result);
+        }
+      }
+
+      for (var i=0; i<result.length; i++){
+        for (var j = 0; j<compResult.length; j++){
+          if(result[i] == compResult[j]){
+            newIndex.push(variations[j]);          
+            compResult[j] = 1000000;
+            break;
+          }
+        }
+      }
+    
+      for (var i = 0; i < result.length; i++){
+        if ( result[i] == 0 ){
+          result[i] = '';
+        }
+      }
+      
+      newIndex = newIndex.toString();      
+
+      if ((selectedMethod == 1 && dvd1 == 1) || selectedMethod == 3){
+        sheet.getRange("B"+(setRow)).setValue(columnBValue);
+      } else {
+        sheet.getRange("B"+(setRow)).setValue(columnBValue);
+      }
+
+      var deductionV = 0;
+
+      var pos0_0 = "C" + (setRow);
+      var pos0_1 = "D" + (setRow);
+      var pos0_2 = "E" + (setRow);
+      var pos0_3 = "F" + (setRow);
+      var pos0_4 = "G" + (setRow);
+
+      var pos1_0 = "H" + (setRow);
+      var pos1_1 = "I" + (setRow);
+      var pos1_2 = "J" + (setRow);
+      var pos1_3 = "K" + (setRow);
+      var pos1_4 = "L" + (setRow);
+
+      var pos2_0 = "M" + (setRow);
+      var pos2_1 = "N" + (setRow);
+      var pos2_2 = "O" + (setRow);
+      var pos2_3 = "P" + (setRow);
+      var pos2_4 = "Q" + (setRow);
+
+      var pos3_0 = "R" + (setRow);
+      var pos3_1 = "S" + (setRow);
+      var pos3_2 = "T" + (setRow);
+      var pos3_3 = "U" + (setRow);
+      var pos3_4 = "V" + (setRow);
+
+      var est1 = (Math.random()*1.5 + 11).toFixed(4);        
+      deductionV = deductionV + result[0] * est1 / 100;      
+
+      var est2 = (Math.random()*1.5 + 11).toFixed(4);        
+      deductionV = deductionV + result[1] * est2 / 100;
+
+      var est3 = (Math.random()*1.5 + 11).toFixed(4);         
+      deductionV = deductionV + result[2] * est3 / 100;
+
+      var est4 = (Math.random()*1.5 + 11).toFixed(4);        
+      deductionV = deductionV + result[3] * est4 / 100;
+
+      var divColumns = parseInt(deductionV / 750) + 1;
+      
+      if (divColumns != multi_number){        
+        // SpreadsheetApp.getUi().alert(multi_number);        
+        continue;
+      } else {      
+      
+        sheet.getRange(pos0_0).setValue(result[0]);
+        sheet.getRange(pos0_1).setValue(est1.toString() + "%");
+        sheet.getRange(pos0_2).setFormula("="+ pos0_0 + "*" + pos0_1);
+        sheet.getRange(pos0_3).setFormula("="+ pos0_4 + "-" + pos0_2);
+        sheet.getRange(pos0_4).setFormula("="+ pos0_2 + "*" + 5);
+
+        sheet.getRange(pos1_0).setValue(result[1]);      
+        sheet.getRange(pos1_1).setValue(est2.toString() + "%");
+        sheet.getRange(pos1_2).setFormula("="+ pos1_0 + "*" + pos1_1); 
+        sheet.getRange(pos1_3).setFormula("="+ pos1_4 + "-" + pos1_2);
+        sheet.getRange(pos1_4).setFormula("="+ pos1_2 + "*" + 5); 
+        
+        sheet.getRange(pos2_0).setValue(result[2]);      
+        sheet.getRange(pos2_1).setValue(est3.toString() + "%");
+        sheet.getRange(pos2_2).setFormula("="+ pos2_0 + "*" + pos2_1);
+        sheet.getRange(pos2_3).setFormula("="+ pos2_4 + "-" + pos2_2);
+        sheet.getRange(pos2_4).setFormula("="+ pos2_2 + "*" + 5);
+
+        sheet.getRange(pos3_0).setValue(result[3]);      
+        sheet.getRange(pos3_1).setValue(est4.toString() + "%");
+        sheet.getRange(pos3_2).setFormula("="+ pos3_0 + "*" + pos3_1);
+        sheet.getRange(pos3_3).setFormula("="+ pos3_4 + "-" + pos3_2);
+        sheet.getRange(pos3_4).setFormula("="+ pos3_2 + "*" + 5);
+        
+
+        sheet.getRange("W"+(setRow)).setValue(newIndex);
+
+        var subresult = [];
+        for (var i = 0; i<result.length; i++){
+          subresult[i] = parseFloat(result[i] * 0.11).toFixed(2);
+        }
+
+        if ( targetRowValue == 8000 ){
+          for (var i = 0; i < subresult.length; i++){
+            if (+subresult[i] > 200){
+              subresult[i] = '200';
+            }
+          }
+        }
+        
+        var sum = 0;
+        var count = 0;
+        for (var i = 0; i < subresult.length; i++){
+          if (subresult[i] != 0){
+            count++;
+          }
+          sum = sum + +subresult[i];
+        }
+
+        for (var i = 0; i < result.length; i++){
+          if ( result[i] == 0 ){
+            subresult[i] = '';
+          }
+        }
+
+        sheet.getRange("X"+(setRow)).setValue(subresult[0]);
+        sheet.getRange("Y"+(setRow)).setValue(subresult[1]);
+        sheet.getRange("Z"+(setRow)).setValue(subresult[2]);
+        sheet.getRange("AA"+(setRow)).setValue(subresult[3]);
+        sheet.getRange("AB"+(setRow)).setValue(sum);
+        sheet.getRange("AC"+(setRow)).setValue(count);
+        
+        if (selectedMethod == 0  || selectedMethod == 1){
+          var recal = targetvalue1;
+        } else if (selectedMethod == 2 || selectedMethod == 3){
+          var recal = columnBValue;
+        }
+
+        sheet.getRange("AD"+(setRow)).setValue(recal);
+        break;
+      }
+      
+    }    
+  }
+}
+function getResult(method, col){  
+
+  switch (col){
+
+      case 0:
+        result = parseFloat((method * (0.4 + Math.random() * 0.35)).toFixed(2));
+        break;
+      case 1:
+        result = parseFloat((method * (0.75 + Math.random() * 0.25)).toFixed(2));
+        break;
+      case 2:
+        result = parseFloat((method * (1 + Math.random() * 0.25)).toFixed(2));
+        break;
+      case 3:
+        result = parseFloat((method * (1.25 + Math.random() * 0.5)).toFixed(2));
+        break;
+    }
+ 
+  return result;
+
+}
+
+function shuffle(array) {
+  var curIndex = array.length;
+  var randIndex = 0; 
+
+  while (curIndex != 0) {
+
+    randIndex = Math.floor(Math.random() * curIndex);
+    curIndex--;
+
+    [array[curIndex], array[randIndex]] = [
+      array[randIndex], array[curIndex]];
+     
+  }
+
+  return array;
+}
+
+function permutation(arr, len){  
+  var result = [];
+
+  var f = function(prefix, arr) {
+    for (var i = 0; i < arr.length; i++) {
+      var elem = [...prefix, arr[i]];
+      if(elem.length == len)
+        result.push(elem);
+      f(elem, arr.slice(i + 1));
+    }
+  }
+  
+  f([], arr);
+  return result;
+}
+
 
 
 
