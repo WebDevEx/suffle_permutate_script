@@ -4862,7 +4862,7 @@ function onEdit(e){
         }
         var difference = Math.abs(6000 - calculatedValue);
 
-        if (difference < closestDifference){
+        if (difference <= closestDifference){
           closestMethod = j;
           closestDifference = difference;
         }
@@ -5301,6 +5301,7 @@ function permutation(arr, len){
   f([], arr);
   return result;
 }
+
 
 
 
