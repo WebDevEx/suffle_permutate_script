@@ -6864,8 +6864,8 @@ function fillInData( option, columnBValue){
   var compResult = [];
     var columnBValue = columnBValue;
     var option = option;
-    if (columnBValue <= 500){
-      columnBValue = 500;
+    if (columnBValue <= 200){
+      columnBValue = 200;
     }
     if (option == "£12,571 to £50,270"){
       var targetRowValue = 6000;
