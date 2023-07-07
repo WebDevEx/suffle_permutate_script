@@ -6824,8 +6824,489 @@ function permutation(arr, len){
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////// INCREASED SPEED WITH ARRAY  ///////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+function onOpen(){
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('GET RESULT')
+    .addItem('GET RESULT', 'distributeTargetValues')
+    .addToUi();
+}
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var sheet = ss.getSheetByName("Sheet1");
+
+function distributeTargetValues(){  
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  var columnBValue = 0;  
+  var getResult = new Array();
+  for (var i = 1; i < values.length; i++){
+    var row = values[i];
+    var option = row[0];
+    columnBValue = row[1];
+    var fillData = fillInData(option,columnBValue);    
+    getResult[i-1] = fillData;
+    
+  }
+  
+  sheet.getRange(2, 2, values.length-1, 23).setValues(getResult);
+}
+
+function fillInData( option, columnBValue){
+    
+  var dvd1 = 0;
+  var dvd2 = 0;
+  var fillData = new Array();
+  var compResult = [];
+    var columnBValue = columnBValue;
+    var option = option;
+    if (columnBValue <= 500){
+      columnBValue = 500;
+    }
+    if (option == "£12,571 to £50,270"){
+      var targetRowValue = 6000;
+      var targetColumnValue = 6000;     
+    } else if (option == "Less than £12,570"){      
+      targetRowValue = 30000;      
+      targetColumnValue = 12500;     
+    }
+    if(columnBValue % 1 === 0){
+      columnBValue = columnBValue + parseFloat((Math.random() * (10.99 - 4) + 4).toFixed(2));         
+    }
+    if (option == "£12,571 to £50,270"){
+      if (columnBValue < 3500){
+        dvd1 = 1;
+        var targetvalue1 = columnBValue * 10;
+      } else if (columnBValue >= 3500){
+        dvd2 = 1;
+        var targetvalue1 = columnBValue / 10;
+      }
+    }else if (option == "Less than £12,570"){        
+      if (columnBValue < 5500){
+        dvd1 = 1;
+        var targetvalue1 = columnBValue * 10;
+      } else if (columnBValue >= 5500){
+        dvd2 = 1;
+        var targetvalue1 = columnBValue / 10;
+      }   
+    }
+    var dd1 = Number.POSITIVE_INFINITY;
+    var dd2 = Number.POSITIVE_INFINITY;
+    var specChoose = 0;
+    if ( option == "£12,571 to £50,270" ){
+      for (var l = 1; l <= 3; l++) {
+        var deductionBasic = parseInt(targetvalue1 / 6000) + 1;
+        if(l < deductionBasic){
+          continue;
+        }
+        var d_target = Math.abs(targetvalue1/l-targetColumnValue);
+        if (d_target <= dd1 ){
+          var dv1 = l;
+          dd1 = d_target;        
+        }
+      }     
+      for (var l = 1; l <= 3; l++){
+        var deductionBasic = parseInt(columnBValue / 6000) + 1;
+        if(l < deductionBasic){
+          continue;
+        }
+        var d_target = Math.abs(columnBValue/l - targetColumnValue);
+        if(d_target <= dd2){
+          var dv2 = l;
+          dd2 = d_target;
+        }
+      }  
+    } else if (option == "Less than £12,570"){      
+      for (var l = 1; l <= 3; l++) {
+        if(targetvalue1 >= 50000 && targetvalue1 <= 55000){
+          var deductionBasic = parseInt(targetvalue1 / 12500);          
+        }else{
+          var deductionBasic = parseInt(targetvalue1 / 12500) + 1;
+        } 
+        if(l < deductionBasic){
+          continue;
+        }
+        var d_target = Math.abs(targetvalue1/l-targetColumnValue);
+        if (d_target <= dd1 ){
+          var dv1 = l;
+          dd1 = d_target;        
+        }
+      }           
+      for (var l = 1; l <= 3; l++){
+        if(columnBValue >= 50000 && columnBValue <= 55000){
+          var deductionBasic = parseInt(columnBValue / 12500);          
+        }else{
+          var deductionBasic = parseInt(columnBValue / 12500) + 1;
+        }        
+        if(l < deductionBasic){
+          continue;
+        }
+        var d_target = Math.abs(columnBValue/l - targetColumnValue);
+        if(d_target <= dd2){
+          var dv2 = l;
+          dd2 = d_target;
+        }
+      }  
+    }     
+    var calculatedValues = [];
+    var method1 = targetvalue1 / dv1;
+    if (dvd1 == 1){
+      var method2 = 1;
+    } else if (dvd2 == 1){
+      var method2 = targetvalue1;      
+    }      
+    var method3 = columnBValue / dv2;          
+    var method4 = columnBValue;    
+    var calculatedValues = [];
+    calculatedValues.push(method1);
+    calculatedValues.push(method2);
+    calculatedValues.push(method3);
+    calculatedValues.push(method4);    
+    var closestMethod = 0;
+    var closestDifference = Number.POSITIVE_INFINITY;    
+    if (option == "£12,571 to £50,270"){
+      for (var j = 0; j < calculatedValues.length; j++){
+        var calculatedValue = calculatedValues[j];
+        if (calculatedValue >= 6000 ){
+          continue;
+        }
+        var difference = Math.abs(6000 - calculatedValue);
+
+        if (difference <= closestDifference){
+          closestMethod = j;
+          closestDifference = difference;
+        }
+      }
+    } else if (option == "Less than £12,570"){
+      if(columnBValue >= 36000 && columnBValue <= 37500){
+        closestMethod = 2;
+        specChoose = 1;
+      }else{
+        if(targetvalue1 >= 36000 && targetvalue1 <= 37500){
+          specChoose = 1;
+        }
+        if (columnBValue >= 11500 && columnBValue <= 12500){
+          specChoose = 1;
+        }
+        for (var j = 0; j < calculatedValues.length; j++){
+          var calculatedValue = calculatedValues[j];
+          if (calculatedValue >= 12600 ){
+            continue;
+          }
+          var difference = Math.abs(12600 - calculatedValue);
+
+          if (difference <= closestDifference){
+            closestMethod = j;
+            closestDifference = difference;
+          }
+        }
+      }
+    }        
+    var arr = [0, 1, 2];    
+    if(specChoose == 0){
+      var variations = ['15~20%', '0~5%', '-20~-15%'];
+    } else if ( specChoose == 1){
+      var variations = ['-15~-10%', '-30~-25%', '-45~-40%'];
+    }    
+    var permu = permutation(arr, 3);
+    var rule = Math.round((permu.length-1) * Math.random()) ;
+    var selRule = permu[rule];     
+    var result = [];    
+    if (option == "£12,571 to £50,270"){     
+      switch (closestMethod) {
+        case 0:
+          switch (dv1){
+            case 1:
+              result.push(method1);
+              result.push(0);
+              result.push(0);             
+              break;
+            case 2:
+              result.push(getResult(specChoose, method1, selRule[0]));
+              result.push(getResult(specChoose, method1, selRule[2]));
+              result.push(0);             
+              break;
+            case 3: 
+              result.push(getResult(specChoose, method1, selRule[0]));
+              result.push(getResult(specChoose, method1, selRule[1]));
+              result.push( getResult(specChoose, method1, selRule[2]));              
+              break;           
+          }
+          break;
+        case 1:
+          if (dvd1 == 1){
+            result.push(method2);
+            result.push(0);
+            result.push(0);            
+          } else if (dvd2 == 1){
+            result.push(getResult(specChoose, method2, selRule[0]));
+            result.push(getResult(specChoose, method2, selRule[1]));
+            result.push(getResult(specChoose, method2, selRule[2]));            
+          }
+          break;
+        case 2:
+          switch (dv2){
+            case 1:
+              result.push(method3);
+              result.push(0);
+              result.push(0);              
+              break;
+            case 2:
+              result.push(getResult(specChoose, method3, selRule[0]));
+              result.push(getResult(specChoose, method3, selRule[2]));
+              result.push(0);
+              break;
+            case 3:
+              result.push(getResult(specChoose, method3, selRule[0]));
+              result.push(getResult(specChoose, method3, selRule[1]));
+              result.push(getResult(specChoose, method3, selRule[2]));
+              break;            
+          }
+          break;
+        case 3:
+          result.push(getResult(specChoose, method4, selRule[0]));
+          result.push(getResult(specChoose, method4, selRule[2]));          
+          result.push(0);        
+          break;
+      } 
+    } else if (option == "Less than £12,570"){           
+      switch (closestMethod) {       
+        case 0:
+          switch (dv1){
+            case 1:
+              result.push(method1);
+              result.push(0);
+              result.push(0);
+              break;
+            case 2:
+              result.push(getResult(specChoose, method1, selRule[0]));
+              result.push(getResult(specChoose, method1, selRule[2]));
+              result.push(0);
+              break;
+            case 3: 
+              result.push(getResult(specChoose, method1, selRule[0]));
+              result.push(getResult(specChoose, method1, selRule[1]));
+              result.push(getResult(specChoose, method1, selRule[2]));
+              break;
+          }
+          break;
+        case 1:
+          if (dvd1 == 1){
+            result.push(method2);
+            result.push(0);
+            result.push(0);
+          } else if (dvd2 == 1){
+            result.push(getResult(specChoose, method2, selRule[0]));
+            result.push(getResult(specChoose, method2, selRule[1]));
+            result.push(getResult(specChoose, method2, selRule[2]));
+          }
+          break;
+        case 2:
+          switch (dv2){
+            case 1:
+              result.push(method3);
+              result.push(0);
+              result.push(0);
+              break;
+            case 2:
+              result.push(getResult(specChoose, method3, selRule[0]));
+              result.push(getResult(specChoose, method3, selRule[2]));
+              result.push(0);
+              break;
+            case 3:
+              result.push(getResult(specChoose, method3, selRule[0]));
+              result.push(getResult(specChoose, method3, selRule[1]));
+              result.push(getResult(specChoose, method3, selRule[2]));
+              break;
+          }
+          break;
+        case 3:
+          result.push(getResult(specChoose, method4, selRule[0]));
+          result.push(getResult(specChoose, method4, selRule[2]));          
+          result.push(0); 
+          break;
+      }
+    }
+    for (var i =0; i<result.length; i++){
+      compResult[i] = result[i];
+    }    
+    var countZero = 0;
+    for (var i = 0; i < result.length; i++){
+      if(result[i] == 0){
+        countZero++;
+      }
+    }
+    if (countZero == 0){
+      result = shuffle(result);
+    } else if (countZero == 1) {
+      result = shuffle(result);
+      while (result[2] != 0){
+        result = shuffle(result);
+      }
+    } else if (countZero == 2){      
+      while ((result[1] != 0) || (result[2] != 0)){
+        result = shuffle(result);
+      }
+    }     
+    var newIndex = [];
+    for (var i=0; i<result.length; i++){
+      for (var j = 0; j<compResult.length; j++){
+        if(result[i] == compResult[j]){
+          newIndex.push(variations[j]);          
+          compResult[j] = 1;
+          break;
+        }
+      }
+    }  
+    for (var i = 0; i < result.length; i++){
+      if ( result[i] == 0 ){
+        result[i] = '';
+      }
+    }    
+    newIndex = newIndex.toString();
+   
+    fillData.push(columnBValue);  
+
+    fillData.push(result[0]);
+    var est1 = (Math.random()*1.5 + 11).toFixed(4);   
+    var est1Result = est1.toString()+"%";
+    fillData.push(est1Result);
+    var ded1 = result[0] * est1 /100;
+    fillData.push(ded1);
+    var grossA1 = ded1 * 5;
+    var netA1 = grossA1 - ded1;
+    fillData.push(netA1);
+    fillData.push(grossA1);
+
+    fillData.push(result[1]);
+    var est2 = (Math.random()*1.5 + 11).toFixed(4);   
+    var est2Result = est2.toString()+"%";
+    fillData.push(est2Result);
+    var ded2 = result[1] * est2 / 100;
+    fillData.push(ded2);
+    var grossA2 = ded2 * 5;
+    var netA2 = grossA2 - ded2;
+    fillData.push(netA2);
+    fillData.push(grossA2);
+
+    fillData.push(result[2]);
+    var est3 = (Math.random()*1.5 + 11).toFixed(4);   
+    var est3Result = est3.toString()+"%";
+    fillData.push(est3Result);
+    var ded3 = result[2] * est3 / 100;
+    fillData.push(ded3);
+    var grossA3 = ded3 * 5;
+    var netA3 = grossA3 - ded3;
+    fillData.push(netA3);
+    fillData.push(grossA3);
+
+    fillData.push(newIndex);
+   
+    var subresult = [];
+    for (var i = 0; i<result.length; i++){
+      subresult[i] = parseFloat(result[i] * 0.11).toFixed(2);
+    }
+    // if ( targetRowValue == 6000 ){
+      for (var i = 0; i < subresult.length; i++){
+        if (+subresult[i] > 200){
+          subresult[i] = '200';
+        }
+      }
+    // }    
+    var sum = 0;
+    var count = 0;
+    for (var i = 0; i < subresult.length; i++){
+      if (subresult[i] != 0){
+        count++;
+      }
+      sum = sum + +subresult[i];
+    }
+    for (var i = 0; i < result.length; i++){
+      if ( result[i] == 0 ){
+        subresult[i] = '';
+      }
+    }
+    // fillData.push(subresult);
+    for (var i=0; i<result.length; i++){
+      fillData.push(subresult[i]);
+    }
+    fillData.push(sum);
+    fillData.push(count);
+      
+    if (closestMethod ==0  || closestMethod == 1){
+      var recal = targetvalue1;
+    } else if (closestMethod == 2 || closestMethod == 3){
+      var recal = columnBValue;
+    }
+    fillData.push(recal);    
+    
+    return fillData;
+}
+
+function getResult(specChoose, method, col){    
+  switch (col){
+      case 0:
+        if(specChoose == 0 ){
+          result = parseFloat((method * (1.15 + Math.random() * 0.05)).toFixed(2));     
+        } else if (specChoose == 1 ){
+          result = parseFloat((method * (0.85 + Math.random() * 0.05)).toFixed(2));
+        }                  
+        break;
+      case 1:
+        if(specChoose == 0 ){
+          result = parseFloat((method * (1 + Math.random() * 0.05)).toFixed(2));          
+        }else if (specChoose == 1 ){
+          result = parseFloat((method * (0.7 + Math.random() * 0.05)).toFixed(2));
+        }         
+        break;
+      case 2:
+        if(specChoose == 0 ){
+          result = parseFloat((method * (0.8 + Math.random() * 0.05)).toFixed(2));       
+        }else if (specChoose == 1 ){
+          result = parseFloat((method * (0.55 + Math.random() * 0.05)).toFixed(2));
+        }          
+        break;      
+    } 
+  return result;
+}
 
 
+function shuffle(array) {
+  var curIndex = array.length;
+  var randIndex = 0; 
+
+  while (curIndex != 0) {
+
+    randIndex = Math.floor(Math.random() * curIndex);
+    curIndex--;
+
+    [array[curIndex], array[randIndex]] = [
+      array[randIndex], array[curIndex]];
+     
+  }
+
+  return array;
+}
+
+function permutation(arr, len){  
+  var result = [];
+
+  var f = function(prefix, arr) {
+    for (var i = 0; i < arr.length; i++) {
+      var elem = [...prefix, arr[i]];
+      if(elem.length == len)
+        result.push(elem);
+      f(elem, arr.slice(i + 1));
+    }
+  }
+  
+  f([], arr);
+  return result;
+}
 
 
 
